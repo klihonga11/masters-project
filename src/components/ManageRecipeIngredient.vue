@@ -66,6 +66,11 @@
 					//alternative: this.item.alternative
 				});
 
+				//append searchable recipe ingredients node
+				db.ref("/recipeToRecipeIngredients/" + this.$route.params.recipeId + "/ingredients/" + itemKey).update({
+					name: this.item.name
+				});
+
 				this.$router.go(-1);
 			}
 		},

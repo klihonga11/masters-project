@@ -29,14 +29,18 @@
 						<textarea id="textareaDescription" class="form-control" v-model="item.description" rows="5"></textarea>
 					</div>
 
-					<label>Profile Picture: </label>
+					<!--<label>Profile Picture: </label>
 					<div class="form-group">
 						<label class="btn btn-primary" for="browseImage">
 							<input id="browseImage" type="file" style="display:none" @change="updateFilePath($event)" accept="image/*" single>
 							Browse
 						</label>
 						<span class="label label-info" id="upload-file-info">{{item.imageName}}</span>
-					</div>
+					</div>-->
+
+					<button-counter></button-counter>
+
+					<upload-image url="" name="" max_files="1"></upload-image>
 					
 					<div class="form-group">
 						<button type="submit" class="btn btn-success">Save</button>
@@ -78,6 +82,8 @@
 
 <script>
 	import firebase from "../config";
+	import UploadImage from 'vue-upload-image';
+	import ButtonCounter from './ButtonCounter';
 	
 	//import Vue from 'vue'
 	//import {vueImgPreview} from 'vue-img-preview'
@@ -94,6 +100,10 @@
 		name : "ManageCookbook",
 		data () {
 			return {}
+		},
+		components: {
+			UploadImage,
+			
 		},
 		props : {	
 			item : {

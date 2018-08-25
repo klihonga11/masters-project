@@ -86,7 +86,11 @@
 						{
 							label: "Yes",
 							action: (dialog) => {
+								//delete recipe Ingredient node
 								db.ref("/recipeIngredients/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.$route.params.recipeId + "/" + recipeIngredient[".key"]).remove();
+
+								//delete searchable recipe ingredient node
+								db.ref("/recipeToRecipeIngredients/" + this.$route.params.recipeId + "/ingredients/" + recipeIngredient[".key"]).remove();
 								dialog.close();
 							}
 						}

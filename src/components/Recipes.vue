@@ -117,9 +117,21 @@
 						{
 							label: "Yes",
 							action: (dialog) => {
-								db.ref("/recipes/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + recipe[".key"]);
+								//delete recipe node
+								db.ref("/recipes/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + recipe[".key"]).remove();
+
+								//delete images
+								db.ref("/recipeImages/" + recipe[".key"]).remove();
+
+								//delete ingredients node
+								db.ref("/recipeIngredients/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + recipe[".key"]).remove();
+
+								//delete directions node
+								db.ref("/recipeDirections/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + recipe[".key"]).remove();
+
+								//delete searchable ingredients node
+								db.ref("/recipeToRecipeIngredients/" + recipe[".key"]).remove();
 								dialog.close();
-								//this.$router.go(-1);
 							}
 						}
 					]
@@ -134,8 +146,8 @@
 </script>
 
 <style scoped>
-	/*.row {
+	.row {
 		display: flex;
 		align-items: center;
-	}*/ 
+	}
 </style>

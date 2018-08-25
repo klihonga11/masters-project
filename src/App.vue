@@ -32,7 +32,24 @@ export default {
 		background-color: transparent;
 		padding-left:0px; 
 	}
+  
 	.page-header {
 		margin:0px;
+	}
+
+  .glyphicon:link {
+		cursor: auto;
+	}
+
+	.glyphicon:visited {
+		cursor: auto;
+	}
+
+	.glyphicon:hover {
+		cursor: pointer;
+	}
+
+	.glyphicon:active {
+		cursor: auto;
 	}
 </style>

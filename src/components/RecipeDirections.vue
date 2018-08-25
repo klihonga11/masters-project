@@ -23,35 +23,38 @@
 		</div>
 		<br>
 
-		<ul class="list-group" v-for="recipeDirection in recipeDirections" v-bind:key="recipeDirection['.key']">
-			<div class="list-group-item">
-				<div class="row">
-					<div class="col-xs-10">
-						<h4 class="list-group-item-text">{{recipeDirection.order}}. {{recipeDirection.description}}</h4>
-					</div>
-					<div class="col-xs-1" > 
-						<span id="overflow" class="glyphicon glyphicon-pencil" v-on:click.stop.prevent="edit(recipeDirection)"></span>	
-					</div>
-					<div class="col-xs-1" > 
-						<span id="overflow" class="glyphicon glyphicon-trash" v-on:click.stop.prevent="deleteItem(recipeDirection)"></span>	
+		<draggable v-model="recipeDirections" v-on:end="reOrder(recipeDirections)">
+			<ul class="list-group" v-for="recipeDirection in recipeDirections" v-bind:key="recipeDirection['.key']">
+				<div class="list-group-item">
+					<div class="row">
+						<div class="col-xs-10">
+							<h4 class="list-group-item-text">{{recipeDirection.order}}. {{recipeDirection.description}}</h4>
+						</div>
+						<div class="col-xs-1" > 
+							<span id="overflow" class="glyphicon glyphicon-pencil" v-on:click.stop.prevent="edit(recipeDirection)"></span>	
+						</div>
+						<div class="col-xs-1" > 
+							<span id="overflow" class="glyphicon glyphicon-trash" v-on:click.stop.prevent="deleteItem(recipeDirection)"></span>	
+						</div>
 					</div>
 				</div>
-			</div>
+			</ul>
+		</draggable>
 
-            <!--<div class="card">
-				<div class="card-body">
-					<h4 class="card-title">{{recipeDirection.order}}</h4>
-					<p class="card-text">{{recipeDirection.description}}</p>
-					<a href="#" class="btn btn-primary" v-on:click.prevent="edit(recipeDirection)">Edit</a>
-					<a href="#" class="btn btn-danger" v-on:click.prevent="deleteItem(recipeDirection)">Delete</a>
-				</div>
-			</div> -->
-		</ul>
+		<!--<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">{{recipeDirection.order}}</h4>
+				<p class="card-text">{{recipeDirection.description}}</p>
+				<a href="#" class="btn btn-primary" v-on:click.prevent="edit(recipeDirection)">Edit</a>
+				<a href="#" class="btn btn-danger" v-on:click.prevent="deleteItem(recipeDirection)">Delete</a>
+			</div>
+		</div> -->
 	</div>
 </template>
 
 <script>
     import firebase from "../config";
+	import draggable from 'vuedraggable';
 
     let db = firebase.database();
 
@@ -62,6 +65,9 @@
 				
 			}
 		},
+		components: {
+            draggable,
+        },
 		methods : {
 			addNew : function() {
                 this.$router.push({name:'ManageRecipeDirection', params:{cookbookId:this.$route.params.cookbookId, recipeCategoryId:this.$route.params.recipeCategoryId, recipeId:this.$route.params.recipeId}})
@@ -94,10 +100,20 @@
 						}
 					]
 				});
+			},
+			reOrder: function(recipeDirections) {				
+				let i;
+				for(i = 1; i <= recipeDirections.length; i++) {
+					recipeDirections[i - 1].order = i;
+					
+					db.ref("/recipeDirections/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.$route.params.recipeId + "/" + recipeDirections[i - 1][".key"]).update({
+						order: Number(i)
+					});
+				}
 			}
         },
         created() {
-			this.$bindAsArray('recipeDirections', db.ref("/recipeDirections/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.$route.params.recipeId))
+			this.$bindAsArray('recipeDirections', db.ref("/recipeDirections/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.$route.params.recipeId).orderByChild("order"))
 		}
 	}
 </script>
@@ -107,4 +123,20 @@
 		display: flex;
 		align-items: center;
 	} 
+
+	.list-group-item:link {
+		cursor: auto;
+	}
+
+	.list-group-item:visited {
+		cursor: auto;
+	}
+
+	.list-group-item:hover {
+		cursor: move;
+	}
+
+	.list-group-item:active {
+		cursor: auto;
+	}
 </style>

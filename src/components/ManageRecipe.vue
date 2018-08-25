@@ -117,33 +117,20 @@
 					cookingTimeHours: Number(this.item.cookingTimeHours),
 					cookingTimeMinutes: Number(this.item.cookingTimeMinutes)
 				});
-			},
-			deleteItem : function() {
-				/*if(confirm("Are you sure you want to DELETE '" + this.item.name + "'?")) {
-					db.ref("/recipes/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.item[".key"]).remove();
-					this.$router.go(-1);
-				}*/
 
-				BootstrapDialog.show({
-					title: "Delete Recipe",
-					message: "Are you sure you want to delete '" + this.item.name + "'?",
-					type: BootstrapDialog.TYPE_DANGER,
-					buttons: [
-						{
-							label: "No",
-							action: function(dialog) {
-								dialog.close();
-							}
-						},
-						{
-							label: "Yes",
-							action: function(dialog) {
-								db.ref("/recipes/" + firebase.auth().currentUser.uid + "/" + this.$route.params.cookbookId + "/" + this.$route.params.recipeCategoryId + "/" + this.item[".key"]).remove();
-								dialog.close();
-								this.$router.go(-1);
-							}
-						}
-					]
+				//save profile picture to recipeImages
+				db.ref("/recipeImages/" + itemKey + "/profilePicture/").update({
+					imageUrl : this.item.imageUrl
+				});
+
+				//save other images
+				
+
+				//create searchable ingredients node
+				db.ref("/recipeToRecipeIngredients/" + itemKey + "/").update({
+					authorId: firebase.auth().currentUser.uid,
+					cookbookId: this.$route.params.cookbookId,
+					recipeCategoryId: this.$route.params.recipeCategoryId
 				});
 			},
 			uploadImage : function() {
