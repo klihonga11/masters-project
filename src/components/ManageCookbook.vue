@@ -38,8 +38,6 @@
 						<span class="label label-info" id="upload-file-info">{{item.imageName}}</span>
 					</div>-->
 
-					<button-counter></button-counter>
-
 					<upload-image url="" name="" max_files="1"></upload-image>
 					
 					<div class="form-group">
@@ -83,7 +81,7 @@
 <script>
 	import firebase from "../config";
 	import UploadImage from 'vue-upload-image';
-	import ButtonCounter from './ButtonCounter';
+	//import ButtonCounter from './ButtonCounter';
 	
 	//import Vue from 'vue'
 	//import {vueImgPreview} from 'vue-img-preview'
