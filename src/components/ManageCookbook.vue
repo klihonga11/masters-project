@@ -20,12 +20,12 @@
 			<div class="col-sm-6"> -->
 				<form v-on:submit.prevent="saveAndExit()"> <!--class="form-horizontal"-->
 					<div class="form-group">
-						<label for="inputTitle" class="control-label">*Title: </label>
+						<label for="inputTitle" class="control-label">*Title </label>
 						<input id="inputTitle" class="form-control" type="text" v-model="item.title" name="title" autocomplete="off" required/> <!-- v-model="item.title" -->
 					</div>
 
 					<div class="form-group">
-						<label for="textareaDescription" class="control-label">Description: </label>
+						<label for="textareaDescription" class="control-label">Description </label>
 						<textarea id="textareaDescription" class="form-control" v-model="item.description" rows="5"></textarea>
 					</div>
 
@@ -38,10 +38,27 @@
 						<span class="label label-info" id="upload-file-info">{{item.imageName}}</span>
 					</div>-->
 
-					<div id="comp">
-						<upload-image url="" name="" max_files="1"></upload-image>
+					<div class="form-group"> 
+						<label for="profilePicture" class="control-label">Profile Picture </label>   
+						<picture-input 
+							id="profilePicture"
+							ref="pictureInput" 
+							width="250" 
+							height="250"
+							margin="0" 
+							accept="image/jpeg,image/png" 
+							size="10" 
+							buttonClass="btn"
+							:crop="false"
+							:prefill="item.imageUrl"
+							:prefillOptions="{mediaType: 'image/jpeg', mediaType: 'image/png'}"
+							:removable="true"
+							@change="onChange"
+							@remove="onRemove">
+						</picture-input>
 					</div>
 
+					<!-- :prefill="item.imageUrl"  -->
 					<!--<button-counter></button-counter>-->
 					
 					<div class="form-group">
@@ -74,7 +91,7 @@
 					</label>
 					<span class="label label-info" id="upload-file-info">{{item.imageName}}</span>
 				</div>
-				
+
 				<div class="form-group">
 					<button type="submit" class="btn btn-success">Save</button>
 				</div>
@@ -85,7 +102,7 @@
 <script>
 	import firebase from "../config";
 	import Count from './Count';
-	import UploadImage from './UploadImage';
+	import PictureInput from 'vue-picture-input';
 	
 	//import Vue from 'vue'
 	//import {vueImgPreview} from 'vue-img-preview'
@@ -104,8 +121,8 @@
 			return {}
 		},
 		components: {
-			UploadImage,
-			Count
+			Count,
+			PictureInput
 		},
 		props : {	
 			item : {
@@ -113,7 +130,6 @@
 				default : () => ({
 					title : "",
 					description : "",
-					imageName: "",
 					imageUrl : "",
 					publicationDate : "",
 					isPublished: false
@@ -138,7 +154,6 @@
 				db.ref("/cookbooks/" + auth.currentUser.uid + "/" + itemKey).update({
 					title : this.item.title,
 					description : this.item.description,
-					imageName: this.item.imageName,
 					imageUrl : this.item.imageUrl,
 					publicationDate : this.item.publicationDate,
 					isPublished : this.item.isPublished
@@ -175,7 +190,11 @@
 			uploadImage: function () {
 				const ref = firebase.storage().ref();
 
-				const file = document.querySelector("#browseImage").files[0];
+				/*const file = document.querySelector("#browseImage").files[0];
+				const name = file.name;
+				const metadata = { contentType: file.type };*/
+
+				const file = this.$refs.pictureInput.file;
 				const name = file.name;
 				const metadata = { contentType: file.type };
 
@@ -229,17 +248,28 @@
 					if(event.target.files[0] != undefined) { //dialog was cancelled
 						let selectedName = event.target.files[0].name;
 						let currentName = this.item.imageName;
-						//let currentName = this.item.imageUrl.substring(this.item.imageUrl.lastIndexOf('/'));
 
 						if(selectedName != "" && selectedName != currentName) {
 							this.needToUploadFile = true;
 							this.item.imageName = selectedName;
 						}
-
-						//console.log("Selected name: " + selectedName);
-						//console.log("Current name: " + currentName);
-						//console.log("Need to upload? : " + this.needToUploadFile);
 					}
+				},
+				onChange : function (image) {
+					console.log('New picture selected!')
+					if (image) {
+						console.log('Picture loaded.')
+						
+						this.needToUploadFile = true;
+					} else {
+						console.log('FileReader API not supported: use the <form>, Luke!')
+					}
+				},
+				onRemove : function(image) {
+					console.log('image removed');
+
+					this.needToUploadFile = false;
+					this.item.imageUrl = "";
 				}
 			},
 			computed : {

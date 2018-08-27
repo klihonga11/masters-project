@@ -58,20 +58,25 @@
 				</div>
 			</div>
 
-			<label>Profile Picture</label>
-			<div class="form-group">
-				<label class="btn btn-primary" for="browseImage">
-					<input id="browseImage" type="file" style="display:none" @change="updateFilePath($event)" accept="image/*" single>
-					Browse
-				</label>
-				<!--<span class="label label-info" id="upload-file-info">{{item.imageName}}</span>-->
+			<div class="form-group"> 
+				<label for="profilePicture" class="control-label">Profile Picture: </label>   
+				<picture-input 
+					id="profilePicture"
+					ref="pictureInput" 
+					width="250" 
+					height="250"
+					margin="0" 
+					accept="image/jpeg,image/png" 
+					size="10" 
+					buttonClass="btn"
+					:crop="false"
+					:prefill="item.imageUrl"
+					:prefillOptions="{mediaType: 'image/jpeg', mediaType: 'image/png'}"
+					:removable="true"
+					@change="onChange"
+					@remove="onRemove">
+				</picture-input>
 			</div>
-
-			<!--<div class="form-group">
-				<label class="btn btn-default">
-					Browse Images <input id="browseImage" type="file" accept="image/*" v-on:change="updateFilePath($event)" single hidden>
-				</label>
-			</div>-->
 
 			<div class="form-group">
 				<button type="submit" class="btn btn-success">Save</button>
@@ -82,6 +87,7 @@
 
 <script>
 	import firebase from "../config";
+	import PictureInput from "vue-picture-input";
 
 	let db = firebase.database();
 
@@ -92,6 +98,9 @@
 		name : 'ManageRecipe',
 		data () {
 			return { }
+		},
+		components: {
+			PictureInput
 		},
 		methods : {
 			saveAndExit : function() {
@@ -136,7 +145,7 @@
 			uploadImage : function() {
 				const ref = firebase.storage().ref();
 
-				const file = document.querySelector("#browseImage").files[0];
+				const file = this.$refs.pictureInput.file;
 				const name = file.name;
 				const metadata = { contentType: file.type };
 
@@ -189,15 +198,21 @@
 						});
 					});
 			},
-			updateFilePath : function(event) {
-				if(event.target.files[0] != undefined) { //dialog was cancelled
-					let selectedName = event.target.files[0].name;
-					let currentName = this.item.imageUrl.substring(this.item.imageUrl.lastIndexOf('/'));
-
-					if(selectedName != "" && selectedName != currentName) {
-						this.needToUploadFile = true;
-					}
+			onChange : function(image) {
+				console.log('New picture selected!')
+				if (image) {
+					console.log('Picture loaded.')
+					
+					this.needToUploadFile = true;
+				} else {
+					console.log('FileReader API not supported: use the <form>, Luke!')
 				}
+			},
+			onRemove : function(image) {
+				console.log('image removed');
+
+				this.needToUploadFile = false;
+				this.item.imageUrl = "";
 			}
 		},
 		props : {
